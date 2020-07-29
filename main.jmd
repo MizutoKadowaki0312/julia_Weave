@@ -1,0 +1,75 @@
+---
+title: Hamiltonian Problems in Julia
+author: Mizuto Kadowaki
+date: 29th July 2020
+---
+
+Using the `HamiltonianProblem`, one only needs to define the Hamiltonian to give a solution for the generalized coordinates and momentum. The following is an introduction.
+
+# problem-setting
+
+Consider a one-dimensional harmonic oscillator. The Hamiltonian is the following equation.
+
+$$
+H(q,p) = \dfrac{p^2}{2m} + \dfrac{1}{2}m\omega q^2
+$$
+
+where ω is the angular frequency. From here, we find $q(t)$ and $p(t)$.
+
+# package
+
+The packages used are the following.
+
+```julia; term = true
+using Plots
+using DifferentialEquations
+```
+# parameter
+
+```julia; term = true
+m = 1 #mass
+k = rand() #spring constant
+ω = sqrt(k/m) #angular frequency
+p0 = 10*rand() #p(0)
+q0 = 10*rand() #q(0)
+```
+
+# Hamiltonian
+
+```julia; term = true
+H(p , q , param=Float64[]) = (p^2/(2*m)) + (1/2)*m*ω^2*q^2
+```
+
+# Solving
+
+```julia; term = true
+prob = HamiltonianProblem(H , p0 , q0 , (0. , 20.))
+sol = solve(prob , dt = 0.01)
+```
+
+# Plot
+
+```julia; term = true
+plot(sol , label = ["p(t)" "q(t)"] , ylabel = "p(t) & q(t)" , lw = 3)
+```
+
+# analytical solution
+
+The analytical solution obtained by solving the differential equations is
+
+$$
+q(t) = q(0)\cos{\omega t} + \dfrac{p(0)}{m\omega}\sin{\omega t}
+$$
+
+$$
+p(t) = -mωq(0)\sin{\omega t} + p(0)\cos{\omega t}
+$$
+
+```julia; term = true
+Q(t) = q0*cos(ω*t) + (p0/(m*ω))*sin(ω*t) #q(t)
+P(t) = -m*ω*q0*sin(ω*t) + p0*cos(ω*t) #p(t)
+t = 0:0.01:20
+plot!(t , P , ls =:dash , label = "Analytical Solution p(t)" , lw = 2 , color = :purple)
+plot!(t , Q , ls =:dash , label = "Analytical Solution q(t)" , lw = 2 , color = :green)
+```
+
